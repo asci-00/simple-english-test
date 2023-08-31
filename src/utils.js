@@ -74,14 +74,14 @@ export const getQuestion = ({type, english, korean, question}) => {
 //     .reduce((acc, curr) => acc += curr, 0);
 // }
 //
-export const submitExamResult = async (words) => await axios.post('http://127.0.0.1:5000/apply_result', words.map(word => ({
+export const submitExamResult = async (words) => await axios.post('http://192.168.101.128:5000/apply_result', words.map(word => ({
   id: word.id,
   type: word.type,
   correct: word.correct,
   question_mean: word.question_mean,
 })));
 
-export const submitNewWords = async (words) => await axios.post('http://127.0.0.1:5000/english_words', words.map(word => ({
+export const submitNewWords = async (words) => await axios.post('http://192.168.101.128:5000/english_words', words.map(word => ({
   english: word.english,
   korean: word.korean,
   english_meaning: word.englishMeaning,
@@ -90,7 +90,7 @@ export const submitNewWords = async (words) => await axios.post('http://127.0.0.
   english_question_answer: word.englishQuestionAnswer,
 })));
 
-export const getWordList = async () => (await axios.get('http://127.0.0.1:5000/english_words')).data.map(word => (
+export const getWordList = async () => (await axios.get('http://192.168.101.128:5000/english_words')).data.map(word => (
   {
     ...word,
     correct: null,
