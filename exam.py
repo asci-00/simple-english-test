@@ -54,4 +54,4 @@ def apply_exam_result():
     return Response({'message': 'success'}, mimetype='application/json', status=200)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', debug=True)

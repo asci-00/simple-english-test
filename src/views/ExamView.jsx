@@ -14,7 +14,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CreateIcon from '@mui/icons-material/Create';
 import CancelIcon from '@mui/icons-material/Cancel';
 import {useCallback, useEffect, useState} from "react";
-import {EN_SENTENCE_QUESTION, getQuestion, getWordList, isCorrectAnswer, submitExamResult,} from "../utils";
+import {EN_SENTENCE_QUESTION, getQuestion, getWordList, isCorrectAnswer, submitExamResult, getCorrectAnswer} from "../utils";
 
 let answers = [];
 
@@ -49,6 +49,14 @@ export default function ExamView() {
     setWords(words.map((word, idx) =>
       ({...word, correct: isCorrectAnswer(word, answers[idx])})
     ));
+
+  const setIsCorrect = (id, value) => {
+    setWords(words.map((word) =>
+      word.id === id ?
+        {...word, correct: value} :
+        word
+    ));
+  }
 
   const onSubmit = async () => {
     try {
@@ -120,10 +128,23 @@ export default function ExamView() {
                     onChange={(ev) => onTextChange(idx, ev)}
                   />
                 </Box>
+                { 
+                  word.correct == false ? 
+                    <Box mx={3}>
+                      {getCorrectAnswer(word)}
+                    </Box> : null
+                }
                 <ButtonGroup>
-                  <Button variant="contained" color="primary" onClick={() => isCorrectAnswer(word, answers[idx])}
-                          tabIndex={-1}>O</Button>
-                  <Button variant="contained" color="secondary" onClick={console.log} tabIndex={-1}>X</Button>
+                  <Button 
+                    variant="contained" 
+                    color="primary" 
+                    onClick={() => setIsCorrect(word.id, true)}
+                    tabIndex={-1}>O</Button>
+                  <Button 
+                    variant="contained" 
+                    color="secondary" 
+                    onClick={() => setIsCorrect(word.id, false)}
+                    tabIndex={-1}>X</Button>
                 </ButtonGroup>
               </Box>
             ))
