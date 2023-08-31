@@ -26,7 +26,7 @@ CORS(app)
 
 app.config['JSON_AS_ASCII'] = False
 
-@app.route('/english_words') 
+@app.route('/english_words')
 def get_english_words():
     en_dict = database.get_words(50)
     print('word len={}'.format(len(en_dict)))
@@ -40,6 +40,12 @@ def get_question_means():
     print('translated_text = {}'.format(translated_text))
     response = json.dumps(translated_text, ensure_ascii=False, indent=4)
     return Response(response, mimetype='application/json', status=200)
+
+@app.route('/english_words', methods=['POST'])
+def add_new_word():
+    new_words = json.loads(request.get_data())
+    database.append_data(new_words)
+    return Response({'message': 'success'}, mimetype='application/json', status=200)
 
 @app.route('/apply_result', methods=['POST'])
 def apply_exam_result():

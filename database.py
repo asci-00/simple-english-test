@@ -32,10 +32,32 @@ def submit_result(words):
 
         question_mean_update_query = ', question_mean = \'{}\''.format(question_mean) if question_mean != None else ''
 
-        if correct: 
+        if correct:
             query = 'update dictionary set {} = {} + 1{} where id = {}'.format(_type, _type, question_mean_update_query, id)
-        else: 
+        else:
             query = 'update dictionary set {} = 0{} where id = {}'.format(_type, question_mean_update_query, id)
         print(query)
         cur.execute(query)
+    config.conn.commit()
+
+def append_data(words):
+    print(words)
+    if len(words) < 0:
+        return
+
+    query = "insert into dictionary (english,korean,english_mean,question,question_mean,answer,en_score,ko_score) values "
+    items = []
+
+    for word in words:
+        items.append("(\"{}\", \"{}\", \"{}\", \"{}\", \"{}\", \"{}\", 0, 0)".format(
+            word['english'],
+            word['korean'],
+            word['english_mean'],
+            word['english_question'],
+            word['english_question_meaning'],
+            word['english_question_answer']
+        ))
+    query = query + ', '.join(items) + ';'
+    print(query)
+    cur.execute(query)
     config.conn.commit()
