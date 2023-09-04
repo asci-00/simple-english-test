@@ -17,7 +17,7 @@ export const isCorrectAnswer = (word, input) => {
   else return correctAnswer === input;
 }
 //
-const getCorrectAnswer = ({type, answer, english, korean}) => {
+export const getCorrectAnswer = ({type, answer, english, korean}) => {
   switch (type) {
     case EN_SENTENCE_QUESTION:
       return answer.trim();
