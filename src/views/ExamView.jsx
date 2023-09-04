@@ -21,6 +21,7 @@ let answers = [];
 export default function ExamView() {
   const [words, setWords] = useState([]);
   const [open, setOpen] = useState(false);
+  const [afterAllCheck, setAfterAllCheck] = useState(false);
 
   useEffect(() => {
     initialize();
@@ -45,10 +46,13 @@ export default function ExamView() {
     const {target: {value}} = ev;
     answers[targetIdx] = value;
   };
-  const onCheck = () =>
+  const onCheck = () => {
     setWords(words.map((word, idx) =>
       ({...word, correct: isCorrectAnswer(word, answers[idx])})
     ));
+    setAfterAllCheck(true);
+  }
+    
 
   const setIsCorrect = (id, value) => {
     setWords(words.map((word) =>
@@ -119,7 +123,7 @@ export default function ExamView() {
                 <Tooltip title={word.type === EN_SENTENCE_QUESTION ? word.question_mean : 'fighting'}>
                   <Box sx={{flexShrink: 0, cursor: 'pointer',}}>{getQuestion(word)}</Box>
                 </Tooltip>
-                <Box sx={{width: '100%', minWidth: 200}} mx={3}>
+                <Box sx={{width: '100%', minWidth: 100}} mx={3}>
                   <TextField
                     key={word.id}
                     sx={{width: '100%'}}
@@ -129,7 +133,7 @@ export default function ExamView() {
                   />
                 </Box>
                 { 
-                  word.correct == false ? 
+                  afterAllCheck ? 
                     <Box mx={3}>
                       {getCorrectAnswer(word)}
                     </Box> : null
@@ -139,11 +143,13 @@ export default function ExamView() {
                     variant="contained" 
                     color="primary" 
                     onClick={() => setIsCorrect(word.id, true)}
+                    disabled={!afterAllCheck}
                     tabIndex={-1}>O</Button>
                   <Button 
                     variant="contained" 
                     color="secondary" 
                     onClick={() => setIsCorrect(word.id, false)}
+                    disabled={!afterAllCheck}
                     tabIndex={-1}>X</Button>
                 </ButtonGroup>
               </Box>
@@ -152,7 +158,7 @@ export default function ExamView() {
         </Box>
         <Box component='div' sx={{mt: 3, p: 3,}} style={{backgroundColor: '#eee'}}>
           <ButtonGroup component='div' fullWidth variant="contained">
-            <Button color="info" onClick={onCheck}>확인</Button>
+            <Button color="info" onClick={onCheck} disabled={afterAllCheck}>확인</Button>
             <Button color="warning" onClick={onSubmit}>제출</Button>
           </ButtonGroup>
         </Box>
