@@ -90,48 +90,37 @@ export const submitNewWords = async (words) => await axios.post('http://192.168.
   english_question_answer: word.englishQuestionAnswer,
 })));
 
-export const getWordList = async () => (await axios.get('http://192.168.101.128:5000/english_words')).data.map(word => (
-  {
-    ...word,
-    correct: null,
-    type: getRandomItem([
-      KO_QUESTION,
-      EN_QUESTION,
-      ...(word.question && word.question !== '%s' ? [EN_SENTENCE_QUESTION] : [])
-    ])
-  }
-));
+export const getWordList = async () => {
+  const words_list = (await axios.get('http://192.168.101.128:5000/english_words')).data.map(word => (
+    {
+      ...word,
+      correct: null,
+      type: getRandomItem([
+        KO_QUESTION,
+        EN_QUESTION,
+        ...(word.question && word.question !== '%s' ? [EN_SENTENCE_QUESTION] : [])
+      ])
+    }
+  ));
+  const question_mean_request_target = words_list
+    .filter(({type, question_mean}) => type === EN_SENTENCE_QUESTION && question_mean === null)
+    .map(({question, answer, id}) => ({
+      id,
+      string: question.replace('%s', answer),
+    }));
 
-// async function App() {
-//   const word_list = (await axios.get('http://127.0.0.1:5000/english_words')).data.map(word => (
-//     {
-//       ...word,
-//       correct: false,
-//       type: getRandomItem([
-//         KO_QUESTION,
-//         EN_QUESTION,
-//         ...(word.question && word.question !== '%s' ? [EN_SENTENCE_QUESTION] : [])
-//       ])
-//     }
-//   ));
-//
-//   const question_mean_request_target = word_list
-//     .filter(({type, question_mean}) => type === EN_SENTENCE_QUESTION && question_mean === null)
-//     .map(({question, answer, id}) => ({
-//       id,
-//       string: question.replace('%s', answer),
-//     }));
-//
-//   console.log(`[App-get-mean-api] ${question_mean_request_target}`)
-//
-//   if(question_mean_request_target.length) await axios('http://127.0.0.1:5000/question_means',
-//     { params: { data: question_mean_request_target.map(({string}) => string) } },
-//   ).then(({data: question_means}) => {
-//     console.log(question_means);
-//
-//     question_mean_request_target.forEach(({id}, idx) => {
-//       const target_word = word_list.find(({id: _id}) => id === _id);
-//       target_word.question_mean = question_means[idx];
-//     });
-//   })
-// }
+  console.log(`[App-get-mean-api] ${question_mean_request_target}`)
+
+  if (question_mean_request_target.length) await axios('http://127.0.0.1:5000/question_means',
+    { params: { data: question_mean_request_target.map(({string}) => string) } },
+  ).then(({data: question_means}) => {
+    console.log(question_means);
+
+    question_mean_request_target.forEach(({id}, idx) => {
+      const target_word = word_list.find(({id: _id}) => id === _id);
+      target_word.question_mean = question_means[idx];
+    });
+  });
+
+  return word_list;
+}
