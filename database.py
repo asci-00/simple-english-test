@@ -1,18 +1,28 @@
 import config
+import random
 
 cur = config.pymysql.cursors.DictCursor(config.conn)
 
+def convert(row):
+    _dict = {}
+    for key, value in row.items():
+        _dict[key] = value
+    return _dict
+
 def get_words(limit):
-    cur.execute('select * from dictionary order by (en_score + ko_score) limit {}'.format(limit))
+    cur.execute('select * from dictionary order by (en_score + ko_score)')
     rows = cur.fetchall()
 
-    def convert(row):
-        _dict = {}
-        for key, value in row.items():
-            _dict[key] = value
-        return _dict
+    item_len = len(rows)
 
-    return [convert(row) for row in rows]
+    if item_len < 60:
+        target_words = [convert(row) for row in rows[0: min(item_len, 50)]]
+        random.shuffle(target_words)
+        return target_words
+
+    target_words = [convert(row) for row in rows[0: 30] + rows[item_len - 30: item_len]]
+    random.shuffle(target_words)
+    return target_words
 
 def get_field(type):
     EN_QUESTION = 0
@@ -41,7 +51,6 @@ def submit_result(words):
     config.conn.commit()
 
 def append_data(words):
-    print(words)
     if len(words) < 0:
         return
 
